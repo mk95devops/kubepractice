@@ -6,13 +6,32 @@ metadata:
     run: fortune-pod
   name: fortune-pod
 spec:
+  volumes:
+  - name: cache-volume
+    emptyDir:
+      sizeLimit: 500Mi
   containers:
-  - args:
-    - sleep
-    - "100000"
-    image: centos:7
+  - image: ubuntu
     name: fortune-pod
-    resources: {}
-  dnsPolicy: ClusterFirst
-  restartPolicy: Always
-status: {}
+    volumeMounts:
+    - mountPath: /html
+      name: cache-volume
+  
+  - args:
+    - apt-get update;
+      apt-get install fortune-mod -y;
+      while true; do /usr/games/fortune > /html/index.html; sleep 5; done
+
+  - image: nginx
+    name: nginx
+    volumeMounts:
+    - name: html-volume
+      mountPath: /usr/share/nginx/html
+      
+      
+
+
+
+
+    
+ 
